@@ -22,16 +22,6 @@ body, html {
 	padding-bottom: 1em;
 }
 
-.parallax {
-	background-image: url('Leaves.jpg');
-  	height: 30%; 
-  	background-attachment: fixed;
-  	background-position: center;
-  	background-repeat: no-repeat;
-  	background-size: cover;
-  	opacity: 0.8;
-}
-
 .parallax2 {
 	background-image: url('Forest.jpg');
   	height: 100%; 
@@ -42,9 +32,15 @@ body, html {
   	opacity: 0.8;
 }
 
-.taskName {
-	
-}
+/*.parallax {
+	background-image: url('Leaves.jpg');
+  	height: 30%; 
+  	background-attachment: fixed;
+  	background-position: center;
+  	background-repeat: no-repeat;
+  	background-size: cover;
+  	opacity: 0.8;
+}*/
 
 /*.inline-block {
 	display: inline-block;

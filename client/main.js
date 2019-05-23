@@ -9,8 +9,6 @@ import '../lib/collections.js';
 Session.set('taskLimit', 10);
 Session.set('userFilter', false);
 
-Session.set('-')
-
 lastScrollTop = 0;
 $(window).scroll(function(event){
 
@@ -36,19 +34,23 @@ Template.top.helpers({
 
 Template.main.helpers({
   	mainAll() {
+  		var userId = Meteor.userId();
+  		var privated = $('#Privated').val();
+  		console.log(privated);
+
   		if (Session.get("userFilter") == false){
 	  		var time = new Date() - 15000;
 	  		var results = todoDB.find({'createdOn': {$gte:time}}).count();
 
 	  		if (results > 0){
-	  			return todoDB.find({}, {sort:{createdOn: -1}, limit:Session.get('taskLimit')});
+	  			return todoDB.find({$or:[{private:{$eq:false}}, {$and:[{private:{$eq:privated}}, {postedBy:{$eq:userId}}] }] }, {sort:{createdOn: -1}, limit:Session.get('taskLimit')});
 	  		} else {
-	    		return todoDB.find({}, {sort:{createdOn: 1}, limit:Session.get('taskLimit')});
+	    		return todoDB.find({$or:[{private:{$eq:false}}, {$and:[{private:{$eq:privated}}, {postedBy:{$eq:userId}}] }] }, {sort:{createdOn: 1}, limit:Session.get('taskLimit')});
 	    	}
 
     	} else {
     		return todoDB.find({postedBy:Session.get("userFilter")}, {sort:{createdOn: 1}, limit:Session.get('taskLimit')});
-    	}  	
+    	}  		
   	},
 
   	taskAge(){
@@ -72,18 +74,16 @@ Template.main.helpers({
 
   	userLoggedIn(){
   		var logged = todoDB.findOne({_id:this._id}).postedBy;
-  		var userName = Meteor.users.findOne({_id:logged}).username;
-  		console.log(userName);
   		return Meteor.users.findOne({_id:logged}).username;
   	},
 
   	userId(){
   		return todoDB.findOne({_id:this._id}).postedBy;
   	},
-
-  	isOwner() {
-    	return this.owner === Meteor.userId();
-    },
+ 
+  	isOwner(){
+  		
+  	},
 });
 
 Template.main.events({
@@ -100,7 +100,12 @@ Template.main.events({
 	},
 
 	'click .js-edit'(event, instance){
+		var editID = this._id;
 
+		$('#editTodo').modal('show');
+
+		$('#changeTodo').val(todoDB.findOne({_id:editID}).task);
+		$('#editTodoID').val(todoDB.findOne({_id:editID})._id);
 	},
 
 	'click .usrClick'(event, instance){
@@ -112,28 +117,28 @@ Template.main.events({
 Template.top.events({
 	'click .js-submit'(event, instance){
 		var Task = $('#newTask').val();
+		var privated = $('#Privated').val();
+		console.log(privated);
 
 		if (Task == ""){
 			Task = "No Task";
 		}
 
 		if($('#private').is(':checked')){
-			todoDB.insert({'task':Task, 'private':1, 'createdOn':new Date().getTime(), 'postedBy':Meteor.user()._id});
+			todoDB.insert({'task':Task, 'private':privated, 'createdOn':new Date().getTime(), 'postedBy':Meteor.user()._id});
 			$("#private").prop("checked", false);
 			$("#newTask").val('');
 		} else {
-			todoDB.insert({'task':Task, 'private':0, 'createdOn':new Date().getTime(), 'postedBy':Meteor.user()._id});
+			todoDB.insert({'task':Task, 'private':false, 'createdOn':new Date().getTime(), 'postedBy':Meteor.user()._id});
 			$("#newTask").val('');
-		}
+		} 
 	},
 });
 
 Template.editTodo.events({
 	'click .js-editSave'(event, instance){
-		var Save = this._id;		
+		var Save = $('#editTodoID').val();
 		var Todo = $('#changeTodo').val();
-
-		console.log(Save, " ", Todo);
 
 		todoDB.update({_id: Save}, {$set:{'task':Todo, 'createdOn':new Date().getTime()}});
 
