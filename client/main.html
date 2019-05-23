@@ -19,7 +19,7 @@
 
 		<div class="col-auto">
 			<div class="custom-control custom-checkbox">
-			  <input class="custom-control-input" type="checkbox" value="" id="hide">
+			  <input class="custom-control-input check" type="checkbox" value="" id="hide">
 			  <label class="custom-control-label" for="hide">Hide Completed Tasks</label>
 			</div>
 		</div>
@@ -49,13 +49,13 @@
 
 <template name="main">
 	{{#each mainAll}}
-	<div class="row main" id="{{_id}}">		
+	<div class="row main {{#if isCompleted}} hide{{/if}}" id="{{_id}}">		
 			<div class="col-auto">			
 				<div class="custom-control custom-checkbox">
 				  <input class="custom-control-input" type="checkbox" value="" id="task{{_id}}">
 				  <label class="custom-control-label" for="task{{_id}}">{{task}}</label>
 				</div>
-			</div>			
+			</div>
 
 			<div class="col-auto">
 				<small class="text-muted">{{taskAge}}</small>
