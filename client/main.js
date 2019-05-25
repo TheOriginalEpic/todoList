@@ -8,7 +8,6 @@ import '../lib/collections.js';
 
 Session.set('taskLimit', 10);
 Session.set('userFilter', false);
-Session.set('check', false);
 
 lastScrollTop = 0;
 $(window).scroll(function(event){
@@ -51,8 +50,6 @@ Template.main.helpers({
     	} else {
     		return todoDB.find({postedBy:Session.get("userFilter")}, {sort:{createdOn: 1}, limit:Session.get('taskLimit')});
     	}
-
-
   	},
 
   	taskAge(){
@@ -85,9 +82,16 @@ Template.main.helpers({
 
   	isCompleted(){
   		if(Session.get('check') == true){
-
+  			if(todoDB.findOne({_id:this._id}).checked == true){
+  				console.log(todoDB.findOne({_id:this._id}).checked);
+  				return Session.get('check');  				
+  			}
+  		} else {
+  			$('#' + this._id).removeClass('hideTasks');
+  			console.log(Session.get('check'));
+  			return Session.get('check');  			
   		}
-  	}
+  	},
 });
 
 Template.main.events({
@@ -116,6 +120,16 @@ Template.main.events({
 		event.preventDefault();
 		Session.set("userFilter", event.currentTarget.id);
 	},
+
+	'click .completed'(event, instance){
+		var compID = this._id;
+
+		if($('.completed').is(':checked')){
+			todoDB.update({_id: compID}, {$set:{'checked':true}});
+		} else {
+			todoDB.update({_id: compID}, {$set:{'checked':false}});
+		}
+	}
 });
 
 Template.top.events({
@@ -137,9 +151,12 @@ Template.top.events({
 		} 
 	},
 
-	'click .check'(event, instance){
-		event.preventDefault();
-		Session.set("check", event.currentTarget.checked);
+	'click #hide'(event, instance){
+		if($('#hide').is(':checked')){
+			Session.set("check", event.currentTarget.checked);
+		} else {
+			Session.set("check", event.currentTarget.checked);
+		}
 	},
 });
 
